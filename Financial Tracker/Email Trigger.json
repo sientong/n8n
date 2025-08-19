@@ -4,13 +4,14 @@
     {
       "parameters": {
         "schemaType": "manual",
-        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"is_receipt\": {\n      \"type\": \"boolean\",\n      \"description\": \"True if the email is an e-receipt, false otherwise.\"\n    },\n    \"transaction_date\": {\n      \"type\": \"string\",\n      \"description\": \"The date of the transaction in YYYY-MM-DD format, if available. Otherwise, leave null.\"\n    },\n    \"merchant_name\": {\n      \"type\": \"string\",\n      \"description\": \"The name of the merchant from whom the purchase was made, if available. Otherwise, leave null.\"\n    },\n    \"total_amount\": {\n      \"type\": \"number\",\n      \"description\": \"The total amount of the transaction, if available. Otherwise, leave null.\"\n    },\n    \"currency\": {\n      \"type\": \"string\",\n      \"description\": \"The currency of the transaction (e.g., USD, EUR), if available. Otherwise, leave null.\"\n    },\n    \"category\": {\n      \"type\": \"string\",\n      \"description\": \"A suggested category for the transaction (e.g., Groceries, Transport, Utilities, Dining, Online Services), if available. Otherwise, leave null.\"\n    },\n    \"payment_method\": {\n      \"type\": \"string\",\n      \"description\": \"The payment method used (e.g., Credit Card, Debit Card, PayPal), if available. Otherwise, leave null.\"\n    }\n  },\n  \"required\": [\"is_receipt\"]\n}"
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"is_receipt\": {\n      \"type\": \"boolean\",\n      \"description\": \"True if the email is an e-receipt, false otherwise.\"\n    },\n    \"transaction_date\": {\n      \"type\": \"string\",\n      \"description\": \"The date of the transaction in dd/MM/yyyy format, if available. Otherwise, leave null.\"\n    },\n    \"merchant_name\": {\n      \"type\": \"string\",\n      \"description\": \"The name of the merchant from whom the purchase was made, if available. Otherwise, leave null.\"\n    },\n    \"total_amount\": {\n      \"type\": \"number\",\n      \"description\": \"The total amount of the transaction, if available. Otherwise, leave null.\"\n    },\n    \"currency\": {\n      \"type\": \"string\",\n      \"description\": \"The currency of the transaction (e.g., USD, EUR), if available. Otherwise, leave null.\"\n    },\n    \"bank\": {\n      \"type\": \"string\",\n      \"description\": \"bank source from where the money is deducted. Otherwise, leave null.\"\n    },\n    \"category\": {\n      \"type\": \"string\",\n      \"description\": \"A suggested category for the transaction (e.g., Eatery, Lifestyle, Household, Transport, Healthcare, and Other), if available. Otherwise, set as Other.\"\n    },\n    \"type\": {\n      \"type\": \"string\",\n      \"description\": \"Outflow for spending and Inflow for receiving money. Otherwise, leave null.\"\n    },\n    \"balance\": {\n      \"type\": \"number\",\n      \"description\": \"Deduct or increase current balance with total_amount. Otherwise, leave null.\"\n    }\n  },\n  \"required\": [\"is_receipt\"]\n}",
+        "autoFix": true
       },
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.2,
       "position": [
-        688,
-        224
+        992,
+        256
       ],
       "id": "dee10905-085e-4dca-9a7f-ba77ef656efb",
       "name": "Structured Output Parser"
@@ -18,16 +19,16 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=\nEmail Subject: {{ $json.Subject }}\nEmail Body: {{ $json. }}",
+        "text": "=\nEmail Subject: {{ $json.subject }}\nEmail Body: {{ $json.html }}",
         "hasOutputParser": true,
         "options": {
-          "systemMessage": "You are an expert financial assistant. Your task is to accurately identify e-receipts and extract detailed transaction information.\n\nTASK: Analyze the shopping text and transform it into EXACTLY this format:\n\nIs Receipt: [set to true if it contains information about bank transfer or payment without using credit card]\n"
+          "systemMessage": "You are an expert financial assistant. Your task is to accurately identify incoming and outgoing transfer then extract detailed transaction information. Get latest balance from google sheet based on bank source and deduct or increase balance accordingly.\n\n"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 2,
       "position": [
-        512,
+        720,
         0
       ],
       "id": "random_string_of_letters_and_numbers",
@@ -38,24 +39,11 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
       "position": [
-        752,
+        1040,
         0
       ],
       "id": "5e6f7a8b-1c2d-3e4f-5a6b-7c8d9e0f1a2d",
       "name": "If Is E-receipt"
-    },
-    {
-      "parameters": {
-        "operation": "appendRow"
-      },
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 2,
-      "position": [
-        1008,
-        -96
-      ],
-      "id": "6f7a8b9c-0d1e-2f3a-4b5c-6d7e8f9a0b1c",
-      "name": "Google Sheets: Add Debit"
     },
     {
       "parameters": {
@@ -68,16 +56,14 @@
         },
         "simple": false,
         "filters": {
-          "sender": "bca@bca.co.id"
+          "sender": "=[\"=bca@bca.co.id\"]"
         },
-        "options": {
-          "downloadAttachments": "={{ true }}"
-        }
+        "options": {}
       },
       "type": "n8n-nodes-base.gmailTrigger",
       "typeVersion": 1.3,
       "position": [
-        256,
+        448,
         0
       ],
       "id": "8e41da67-5c50-4c70-a517-93d27b2e9fea",
@@ -98,8 +84,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        480,
-        192
+        608,
+        208
       ],
       "id": "068fe611-deb7-4546-8204-46d7cbd8eac1",
       "name": "Google Gemini Chat Model",
@@ -107,6 +93,208 @@
         "googlePalmApi": {
           "id": "KAvLtVtRWIoKoZa3",
           "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1s7OuPk0u7mCSSSiif22t1ECTorjtjmZrdlVz3oEoMo0",
+          "mode": "list",
+          "cachedResultName": "Financial Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1s7OuPk0u7mCSSSiif22t1ECTorjtjmZrdlVz3oEoMo0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 836368235,
+          "mode": "list",
+          "cachedResultName": "Debit",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1s7OuPk0u7mCSSSiif22t1ECTorjtjmZrdlVz3oEoMo0/edit#gid=836368235"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Transaction Date": "={{ $json.output.transaction_date }}",
+            "Category": "={{ $json.output.category }}",
+            "Amount": "={{ $json.output.total_amount }}",
+            "Remarks": "={{ $json.output.merchant_name }}",
+            "Type": "={{ $json.output.type }}",
+            "Bank": "={{ $json.output.bank }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Transaction Date",
+              "displayName": "Transaction Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Bank",
+              "displayName": "Bank",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Amount",
+              "displayName": "Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Type",
+              "displayName": "Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Remarks",
+              "displayName": "Remarks",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Balance",
+              "displayName": "Balance",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1248,
+        -96
+      ],
+      "id": "74c77e57-7682-4bb6-b450-989a10419a73",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "vVL5r46djx4xlkcG",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        928,
+        464
+      ],
+      "id": "ed40f1e9-294c-4318-94de-9091a7cf46f8",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "KAvLtVtRWIoKoZa3",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1s7OuPk0u7mCSSSiif22t1ECTorjtjmZrdlVz3oEoMo0",
+          "mode": "list",
+          "cachedResultName": "Financial Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1s7OuPk0u7mCSSSiif22t1ECTorjtjmZrdlVz3oEoMo0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 836368235,
+          "mode": "list",
+          "cachedResultName": "Debit",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1s7OuPk0u7mCSSSiif22t1ECTorjtjmZrdlVz3oEoMo0/edit#gid=836368235"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        848,
+        208
+      ],
+      "id": "8f901677-ab89-48c2-bff9-74d93b9e9335",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "vVL5r46djx4xlkcG",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        80
+      ],
+      "id": "963bdac0-5460-4569-ac43-9d54d8360174",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "chatId": "=7104866744",
+        "text": "=✅ *Spending data detected from email and has been stored!*\n\n📅 Transaction Date: {{ $json['Transaction Date'] }}\n💰 Amount: Rp {{ $json.Amount }}\n🏷️ Category: {{ $json.Category }}\n🔖 Type: {{ $json.Type }}\n📝 Remarks: {{ $json.Remarks }}\n🏦 Bank: {{ $json.Bank }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1408,
+        -96
+      ],
+      "id": "3598f284-d72f-41b1-afba-51d61f1faa52",
+      "name": "Send a text message",
+      "webhookId": "ea1f0b63-d040-480a-a232-838662ad17d8",
+      "credentials": {
+        "telegramApi": {
+          "id": "Xsom2X6dEzHbzj0G",
+          "name": "Telegram account"
         }
       }
     }
@@ -139,7 +327,14 @@
       "main": [
         [
           {
-            "node": "Google Sheets: Add Debit",
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
             "type": "main",
             "index": 0
           }
@@ -167,17 +362,50 @@
           }
         ]
       ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Receipt Analyzer",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "timezone": "Asia/Jakarta",
     "callerPolicy": "workflowsFromSameOwner",
-    "executionTimeout": -1,
     "executionOrder": "v0"
   },
-  "versionId": "b86ae8a8-1c97-46f2-97c0-7c1ac2314316",
+  "versionId": "7e3a9384-24f6-4e0d-8a8f-e634181d8c42",
   "meta": {
+    "templateCredsSetupCompleted": true,
     "instanceId": "6859a4d21a1bc3c7ec3d23cf616f70cd55a22adcf4dd91c3434f6db5d972d053"
   },
   "id": "e7taKwR9T9VnDaWc",
