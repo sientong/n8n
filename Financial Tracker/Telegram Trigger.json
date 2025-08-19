@@ -1,0 +1,775 @@
+{
+  "name": "Telegram Trigger",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {
+          "download": true
+        }
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -528,
+        720
+      ],
+      "id": "ef750046-4c5c-4014-a33c-42e442924f64",
+      "name": "Telegram Trigger",
+      "webhookId": "858dfe5a-dcdc-4632-b412-ee3cca12f3eb",
+      "credentials": {
+        "telegramApi": {
+          "id": "Xsom2X6dEzHbzj0G",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3623e472-68d6-48e5-9da6-133ff4ca22ca",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "/withdrawal",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Withdrawal"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ad99e257-bcaf-42a2-b068-53e0c96729db",
+                    "leftValue": "={{ $json.message.photo[2] }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Photo Invoice"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "41e89fcf-d3a4-4a71-9a0b-5b0d7ea841fc",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "/",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Manual Spending"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "69cae014-32a5-44e4-abb1-bd8324df9b65",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "=/summary",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Summary"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4f8d9425-641e-4044-a54a-d73444ea28e0",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "/help",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Help"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -352,
+        672
+      ],
+      "id": "945a8443-cce0-410a-a90f-8aeac488b7f5",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.message.chat.id }}",
+        "text": "🤖 *Bot Catatan Pengeluaran*\n\n📸 *Kirim foto struk* → Otomatis tersimpan\n✍️ *Ketik pembelian* → \"beli telur 20rb di warung Ajun\"\n📊 *Cek laporan* → `/laporan hari ini`\n\n💡 *Command:*\n• `/laporan hari ini` - Pengeluaran hari ini\n• `/laporan minggu ini` - Pengeluaran minggu ini  \n• `/laporan bulan ini` - Pengeluaran bulan ini\n• `/help` - Panduan ini\n\nMulai dengan kirim foto struk atau ketik belanja Anda! 🚀",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        336,
+        1264
+      ],
+      "id": "9af5d351-c376-456b-8f6f-97dd7f7845e3",
+      "name": "Telegram5",
+      "webhookId": "7ff87751-1f29-417d-a237-acb30f7b9faa",
+      "credentials": {
+        "telegramApi": {
+          "id": "Xsom2X6dEzHbzj0G",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Request /help",
+        "height": 240,
+        "width": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        256,
+        1200
+      ],
+      "typeVersion": 1,
+      "id": "30ce6e37-5099-4e7b-a8ca-2d917f8c8fa7",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Notes ##\nEnsure credential and API key is working",
+        "height": 120,
+        "width": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -544,
+        512
+      ],
+      "typeVersion": 1,
+      "id": "ef69a3ad-cb54-4859-85cd-042007067c95",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1s7OuPk0u7mCSSSiif22t1ECTorjtjmZrdlVz3oEoMo0",
+          "mode": "list",
+          "cachedResultName": "Financial Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1s7OuPk0u7mCSSSiif22t1ECTorjtjmZrdlVz3oEoMo0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Cash",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1s7OuPk0u7mCSSSiif22t1ECTorjtjmZrdlVz3oEoMo0/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Transaction Date": "={{ $now.format('dd/MM/yyyy') }}",
+            "Amount": "={{ $json.message.text.split(\" \").last() }}",
+            "Type": "Income",
+            "Category": "Withdrawal",
+            "Remarks": "=Withdraw from {{ $json.message.text.split(\" \")[1] }}",
+            "Balance": "={{ $json.hasOwnProperty('Balance') ? $json.Balance + Number($json.message.text.split(\" \").last().trim()) : Number($json.message.text.split(\" \").last().trim()) }}\n"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Transaction Date",
+              "displayName": "Transaction Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Amount",
+              "displayName": "Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Type",
+              "displayName": "Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Remarks",
+              "displayName": "Remarks",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Balance",
+              "displayName": "Balance",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1008,
+        256
+      ],
+      "id": "99873ae6-d004-4fa1-8717-ac2cc9308e8c",
+      "name": "Append row in sheet for withdrawa",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "vVL5r46djx4xlkcG",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Withdrawal",
+        "height": 368,
+        "width": 1020,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        272,
+        240
+      ],
+      "typeVersion": 1,
+      "id": "50b105df-1f4f-48c2-aefe-d8af796e1dff",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=✅ Withdrawal information has been saved:\n\n📅 Date: {{ $json['Transaction Date'] }}\n💰 Amount: {{ $json.Amount }}\n📝 Remarks: {{ $json.Remarks }}\n💳 Current Balance: {{ $json.Balance }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1184,
+        256
+      ],
+      "id": "4565ab12-8f14-4408-b614-b1f8d54ff3eb",
+      "name": "Send a text message1",
+      "webhookId": "aa9bb08d-1cf8-4297-9bde-0edc92b48c4e",
+      "credentials": {
+        "telegramApi": {
+          "id": "Xsom2X6dEzHbzj0G",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1s7OuPk0u7mCSSSiif22t1ECTorjtjmZrdlVz3oEoMo0",
+          "mode": "list",
+          "cachedResultName": "Financial Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1s7OuPk0u7mCSSSiif22t1ECTorjtjmZrdlVz3oEoMo0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Cash",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1s7OuPk0u7mCSSSiif22t1ECTorjtjmZrdlVz3oEoMo0/edit#gid=0"
+        },
+        "combineFilters": "OR",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        304,
+        448
+      ],
+      "id": "92ba613a-054d-4afe-af17-b5ab8ddd4092",
+      "name": "Get row(s) in sheet",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "vVL5r46djx4xlkcG",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "keep": "lastItems"
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        448,
+        448
+      ],
+      "id": "6fb5dc00-5bf8-4438-adbc-c4092caa6be5",
+      "name": "Limit",
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "includeUnpaired": true
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        800,
+        272
+      ],
+      "id": "0ae8d8c3-b074-4254-8449-e73c99b89a2f",
+      "name": "Merge",
+      "alwaysOutputData": true,
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "us9tMyToJS7IomI1",
+          "mode": "list"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "message_chat_id": "={{ $('Telegram Trigger').item.json.message.chat.id }}"
+          },
+          "matchingColumns": [
+            "message_chat_id"
+          ],
+          "schema": [
+            {
+              "id": "message_chat_id",
+              "displayName": "message_chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        288,
+        672
+      ],
+      "name": "Call Receipt Recognition for Cash Spending",
+      "id": "769d648f-efd5-4951-804b-8646cebd1f25"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "FUZaYdyxHlqfmeWF",
+          "mode": "list"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "message_text": "={{ $json.message.text }}",
+            "message_chat_id": "={{ $('Telegram Trigger').item.json.message.chat.id }}"
+          },
+          "matchingColumns": [
+            "message_text",
+            "message_chat_id"
+          ],
+          "schema": [
+            {
+              "id": "message_text",
+              "displayName": "message_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "message_chat_id",
+              "displayName": "message_chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        288,
+        1008
+      ],
+      "name": "Call Request Spending Summary",
+      "id": "0deeebbc-852d-4383-b680-5781b6740356"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "2FNQl5YUxNCckQZd",
+          "mode": "list",
+          "cachedResultName": "Manual Spending Input for Cash"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "message_text": "={{ $json.message.text }}",
+            "message_chat_id": "={{ $('Telegram Trigger').item.json.message.chat.id }}"
+          },
+          "matchingColumns": [
+            "message_text",
+            "message_chat_id"
+          ],
+          "schema": [
+            {
+              "id": "message_text",
+              "displayName": "message_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "message_chat_id",
+              "displayName": "message_chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        288,
+        848
+      ],
+      "name": "Call Manual Spending Input for Cash",
+      "id": "babd7881-074f-4fcf-93d2-93763e2a4cc4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d7bb42af-73c4-4896-98de-361292420407",
+              "leftValue": "={{ $json.isEmpty() }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        384
+      ],
+      "id": "56232551-13d1-491a-b562-5b0fdefda943",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=❌ Failed to store withdrawal information:\n\nPlease follow this format:\n/withdrawal [source of withdrawal] [amount]",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1024,
+        464
+      ],
+      "id": "dbedc3db-8532-4082-ac8c-b5c1e6d9f959",
+      "name": "Send a text message",
+      "webhookId": "aa9bb08d-1cf8-4297-9bde-0edc92b48c4e",
+      "credentials": {
+        "telegramApi": {
+          "id": "Xsom2X6dEzHbzj0G",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call Receipt Recognition for Cash Spending",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call Manual Spending Input for Cash",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call Request Spending Summary",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet for withdrawa": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet for withdrawa",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Jakarta",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "fa8cce08-c9ae-48ea-9195-da9a1e5a214f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6859a4d21a1bc3c7ec3d23cf616f70cd55a22adcf4dd91c3434f6db5d972d053"
+  },
+  "id": "R7Joi1s8OpZpvnzX",
+  "tags": []
+}

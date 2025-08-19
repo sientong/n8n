@@ -1,0 +1,185 @@
+{
+  "name": "Email Trigger",
+  "nodes": [
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"is_receipt\": {\n      \"type\": \"boolean\",\n      \"description\": \"True if the email is an e-receipt, false otherwise.\"\n    },\n    \"transaction_date\": {\n      \"type\": \"string\",\n      \"description\": \"The date of the transaction in YYYY-MM-DD format, if available. Otherwise, leave null.\"\n    },\n    \"merchant_name\": {\n      \"type\": \"string\",\n      \"description\": \"The name of the merchant from whom the purchase was made, if available. Otherwise, leave null.\"\n    },\n    \"total_amount\": {\n      \"type\": \"number\",\n      \"description\": \"The total amount of the transaction, if available. Otherwise, leave null.\"\n    },\n    \"currency\": {\n      \"type\": \"string\",\n      \"description\": \"The currency of the transaction (e.g., USD, EUR), if available. Otherwise, leave null.\"\n    },\n    \"category\": {\n      \"type\": \"string\",\n      \"description\": \"A suggested category for the transaction (e.g., Groceries, Transport, Utilities, Dining, Online Services), if available. Otherwise, leave null.\"\n    },\n    \"payment_method\": {\n      \"type\": \"string\",\n      \"description\": \"The payment method used (e.g., Credit Card, Debit Card, PayPal), if available. Otherwise, leave null.\"\n    }\n  },\n  \"required\": [\"is_receipt\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        688,
+        224
+      ],
+      "id": "dee10905-085e-4dca-9a7f-ba77ef656efb",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=\nEmail Subject: {{ $json.Subject }}\nEmail Body: {{ $json. }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are an expert financial assistant. Your task is to accurately identify e-receipts and extract detailed transaction information.\n\nTASK: Analyze the shopping text and transform it into EXACTLY this format:\n\nIs Receipt: [set to true if it contains information about bank transfer or payment without using credit card]\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        512,
+        0
+      ],
+      "id": "random_string_of_letters_and_numbers",
+      "name": "AI Receipt Analyzer"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        752,
+        0
+      ],
+      "id": "5e6f7a8b-1c2d-3e4f-5a6b-7c8d9e0f1a2d",
+      "name": "If Is E-receipt"
+    },
+    {
+      "parameters": {
+        "operation": "appendRow"
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 2,
+      "position": [
+        1008,
+        -96
+      ],
+      "id": "6f7a8b9c-0d1e-2f3a-4b5c-6d7e8f9a0b1c",
+      "name": "Google Sheets: Add Debit"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "sender": "bca@bca.co.id"
+        },
+        "options": {
+          "downloadAttachments": "={{ true }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        256,
+        0
+      ],
+      "id": "8e41da67-5c50-4c70-a517-93d27b2e9fea",
+      "name": "Gmail Trigger",
+      "retryOnFail": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "gJpdmFLpLfjAKB6f",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        480,
+        192
+      ],
+      "id": "068fe611-deb7-4546-8204-46d7cbd8eac1",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "KAvLtVtRWIoKoZa3",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Receipt Analyzer",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Receipt Analyzer": {
+      "main": [
+        [
+          {
+            "node": "If Is E-receipt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Is E-receipt": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets: Add Debit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Receipt Analyzer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Receipt Analyzer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "timezone": "Asia/Jakarta",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": -1,
+    "executionOrder": "v0"
+  },
+  "versionId": "b86ae8a8-1c97-46f2-97c0-7c1ac2314316",
+  "meta": {
+    "instanceId": "6859a4d21a1bc3c7ec3d23cf616f70cd55a22adcf4dd91c3434f6db5d972d053"
+  },
+  "id": "e7taKwR9T9VnDaWc",
+  "tags": []
+}

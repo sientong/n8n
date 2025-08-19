@@ -1,0 +1,395 @@
+{
+  "name": "Manual Spending Input for Cash",
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1s7OuPk0u7mCSSSiif22t1ECTorjtjmZrdlVz3oEoMo0",
+          "mode": "list",
+          "cachedResultName": "Financial Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1s7OuPk0u7mCSSSiif22t1ECTorjtjmZrdlVz3oEoMo0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Cash",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1s7OuPk0u7mCSSSiif22t1ECTorjtjmZrdlVz3oEoMo0/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        544,
+        1456
+      ],
+      "id": "300a2d10-f97c-465d-9238-c18c47d65ac6",
+      "name": "Get row(s) in sheet in Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "vVL5r46djx4xlkcG",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        384,
+        1440
+      ],
+      "id": "14ff028a-252e-4aac-b672-0c213396e049",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "KAvLtVtRWIoKoZa3",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1s7OuPk0u7mCSSSiif22t1ECTorjtjmZrdlVz3oEoMo0",
+          "mode": "list",
+          "cachedResultName": "Financial Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1s7OuPk0u7mCSSSiif22t1ECTorjtjmZrdlVz3oEoMo0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Cash",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1s7OuPk0u7mCSSSiif22t1ECTorjtjmZrdlVz3oEoMo0/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Transaction Date": "={{ $json.output.match(/Transaction Date: (.+)/)[1] }}",
+            "Amount": "={{ $json.output.match(/Amount: (.+)/)[1] }}",
+            "Category": "={{ $json.output.match(/Category: (.+)/)[1] }}",
+            "Remarks": "={{ $json.output.match(/Remarks: (.+)/)[1] }}",
+            "Type": "={{ $json.output.match(/Type: (.+)/)[1] }}",
+            "Balance": "={{ $json.output.match(/Balance: (.+)/)[1] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Transaction Date",
+              "displayName": "Transaction Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Amount",
+              "displayName": "Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Type",
+              "displayName": "Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Remarks",
+              "displayName": "Remarks",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Balance",
+              "displayName": "Balance",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1088,
+        1344
+      ],
+      "id": "f960f6d2-e266-424d-b395-79cda6ecc429",
+      "name": "Append row in cash sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "vVL5r46djx4xlkcG",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Start').item.json.message_chat_id }}",
+        "text": "=✅ *Spending data has been stored!*\n\n📅 Transaction Date: {{ $json['Transaction Date'] }}\n💰 Amount: Rp {{ $json.Amount }}\n🏷️ Category: {{ $json.Category }}\n🔖 Type: {{ $json.Type }}\n📝 Remarks: {{ $json.Remarks }}\n💳 Current balance: Rp {{ $json.Balance }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1280,
+        1344
+      ],
+      "id": "28bfb508-9bd8-441f-af13-1e23fd3ee601",
+      "name": "Send a text message",
+      "webhookId": "ea1f0b63-d040-480a-a232-838662ad17d8",
+      "credentials": {
+        "telegramApi": {
+          "id": "Xsom2X6dEzHbzj0G",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message_text }}",
+        "options": {
+          "systemMessage": "=You are a shopping text parser that converts flexible input text into a structured format.\n\nTASK: Analyze the shopping text and transform it into EXACTLY this format:\n\nTransaction Date: {{ $now.format('dd/MM/yyyy') }}\nAmount: [total price in numbers only, without currency]  \nCategory: [fit the input into one of this categories: eatery, transport, lifestyle, household, others]\nType: [if it is a spending then set as Outcome, otherwise set as Income]\nRemarks: [store name or other information]\nBalance: [get latest balance from google sheet and deducted by current amount]\n\nEXAMPLES:\n\nInput: parking 5000\nOutput:\n\nTransaction Date: 16/08/2025  \nAmount: 5000  \nCategory: Transport\nType: Outcome\nRemarks: Parking\nBalance: 495000\n\nInput: dinner at WSS 150000\nOutput:\n\nTransaction Date: 16/08/2025  \nAmount: 150000  \nCategory: Eatery\nType: Outcome\nRemarks: Dinner at WSS\nBalance: 345000\n\nIf the text cannot be understood, return:\n\nERROR: Shopping text cannot be understood  \n\nIMPORTANT: Only respond in the format above!"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        384,
+        1248
+      ],
+      "id": "d2d1f028-8c04-4954-8310-700d2e6a603b",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "58fafc3a-fff2-4a25-896c-ea90769b0c9a",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "ERROR:",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        736,
+        1248
+      ],
+      "id": "794bea4d-129f-4637-bdde-711ee40c7dce",
+      "name": "If there is error"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Start').item.json.message_chat_id }}",
+        "text": "❌ *Tidak dapat memahami input belanja*\n\nContoh format yang benar:\n• \"beli Telur 1kg Rp 20rb di Toko Mbak Ita\"\n• \"beli susu ultra 2 botol sama roti tawar 15 ribu\"\n• \"belanja di alfamart beli mie indomie 5 bungkus 12000\"\n• \"jajan bakso 2 porsi 20 ribu\"\n\n💡 *Tips:*\n- Sebutkan barang yang dibeli\n- Sertakan harga (opsional)\n- Sebutkan nama toko (opsional)\n\nCoba lagi dengan format yang lebih jelas atau klik /help untuk bantuan! 📝",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        976,
+        1168
+      ],
+      "id": "3a92e8f5-3d56-40a9-bec6-8c750b12357a",
+      "name": "Telegram2",
+      "webhookId": "f85bbc7c-1df6-476e-81d9-5ba40c367099",
+      "credentials": {
+        "telegramApi": {
+          "id": "Xsom2X6dEzHbzj0G",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Manual input for cash",
+        "height": 560,
+        "width": 1144,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        336,
+        1024
+      ],
+      "typeVersion": 1,
+      "id": "95ac4f37-9b04-472b-848e-339a4d5d4673",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "message_text",
+              "type": "any"
+            },
+            {
+              "name": "message_chat_id",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "id": "a9b545be-71ad-44f4-a38c-2d9fd58828dd",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        176,
+        1248
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If there is error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If there is error": {
+      "main": [
+        [
+          {
+            "node": "Telegram2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in cash sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in cash sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1167ca75-305f-4b34-9f75-13c5607791e5",
+  "meta": {
+    "instanceId": "6859a4d21a1bc3c7ec3d23cf616f70cd55a22adcf4dd91c3434f6db5d972d053"
+  },
+  "id": "2FNQl5YUxNCckQZd",
+  "tags": []
+}

@@ -1,0 +1,341 @@
+{
+  "name": "Receipt Recognition for Cash Spending",
+  "nodes": [
+    {
+      "parameters": {
+        "chatId": "={{ $('Start').item.json.message_chat_id }}",
+        "text": "=✅ *Data belanja manual berhasil disimpan!*\n\n🏪 *Toko:* {{ $json.Toko }}\n💰 *Total:* {{ $json.Total }}\n📦 *Items:* {{ $json.Items }}\n📅 *Tanggal:* {{ $json['Tanggal Struk'] }}\n\n📊 Data telah tersimpan ke Google Sheets!",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1312,
+        768
+      ],
+      "id": "bf08d63b-6411-466f-b3af-9b0ce88f5f56",
+      "name": "Telegram1",
+      "webhookId": "73daee3c-75d6-4a6e-8bf4-10cb9c4a811e",
+      "credentials": {
+        "telegramApi": {
+          "id": "Xsom2X6dEzHbzj0G",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1s7OuPk0u7mCSSSiif22t1ECTorjtjmZrdlVz3oEoMo0",
+          "mode": "list",
+          "cachedResultName": "Financial Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1s7OuPk0u7mCSSSiif22t1ECTorjtjmZrdlVz3oEoMo0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Cash",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1s7OuPk0u7mCSSSiif22t1ECTorjtjmZrdlVz3oEoMo0/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Transaction Date": "={{ $json.candidates[0].content.parts[0].text.match(/Transaction Date: (.+)/)[1] }}",
+            "Amount": "={{ $json.candidates[0].content.parts[0].text.match(/Amount: (.+)/)[1] }}",
+            "Category": "={{ $json.candidates[0].content.parts[0].text.match(/Category: (.+)/)[1] }}",
+            "Remarks": "={{ $json.candidates[0].content.parts[0].text.match(/Remarks: (.+)/)[1] }}",
+            "Type": "={{ $json.candidates[0].content.parts[0].text.match(/Type: (.+)/)[1] }}",
+            "Balance": "={{ $input.last().json.Balance - Number($json.message.text.split(\" \").last()) }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Transaction Date",
+              "displayName": "Transaction Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Amount",
+              "displayName": "Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Type",
+              "displayName": "Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Remarks",
+              "displayName": "Remarks",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Balance",
+              "displayName": "Balance",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1152,
+        768
+      ],
+      "id": "e1a1929e-1999-471c-872f-2b43f77c61a5",
+      "name": "Append row in cash sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "vVL5r46djx4xlkcG",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "23f4316d-5a77-45ae-81e7-18ee4cacb995",
+              "leftValue": "={{ $json.candidates[0].content.parts[0].text }}",
+              "rightValue": "ERROR:",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        800,
+        656
+      ],
+      "id": "2229d520-c467-46f0-915a-edbc36428e5b",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        400,
+        656
+      ],
+      "id": "6222e270-daaa-478c-a922-862d0f6ae254",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=[API KEY KAMU]",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n\"text\": \"Analyse receipt and provide following information:\\n\\nTransaction Date: [transaction date]\\nAmount: [total invoice without currency]\\nCategory: [define its category into -> eatery, transport, lifestyle, household, or others]\\nType:Outcome\\nRemarks: [Additional information which contains seller information]\\n\\nCorrect Example:\\nTransaction Date: 19/06/2025\\nAmount: 25500\\nCategory: Eatery\\nType:Outcome\\nRemarks: Indomaret\\n\\nIf receipt cannot be analysed or blurred, give:\\nERROR: Receipt cannot be analysedn\\nImportant: Only give response in above format!\"\n        },\n        {\n          \"inlineData\": {\n            \"mimeType\": \"image/jpeg\",\n            \"data\": \"{{ $json.data }}\"\n          }\n        }\n      ]\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        608,
+        656
+      ],
+      "id": "8c58c903-1fdc-4f2e-b5e3-c187ff706e9b",
+      "name": "Receipt Analysis"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Start').item.json.message_chat_id }}",
+        "text": "Receipt cannot be analysed.|Ensure:- Photo is clear and not blur- Has enough light- All text are visible. Please rtry again! 📷",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1072,
+        560
+      ],
+      "id": "b5a1806a-db5e-4ae5-bb79-50c6ff2956b6",
+      "name": "Error Response",
+      "webhookId": "8789614c-2e8b-4c58-be9b-38a462213126",
+      "credentials": {
+        "telegramApi": {
+          "id": "Xsom2X6dEzHbzj0G",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Workflow for receipt uploading",
+        "height": 460,
+        "width": 1140,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        336,
+        464
+      ],
+      "typeVersion": 1,
+      "id": "86bebeac-6156-44dc-a907-239e09d8ccad",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "message_chat_id",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "id": "6a62ab6a-d0f2-44b7-ab75-64b1610ba960",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        192,
+        656
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Error Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in cash sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Receipt Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Receipt Analysis": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in cash sheet1": {
+      "main": [
+        [
+          {
+            "node": "Telegram1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "edc52381-2ba5-4f74-a138-a326416a09ff",
+  "meta": {
+    "instanceId": "6859a4d21a1bc3c7ec3d23cf616f70cd55a22adcf4dd91c3434f6db5d972d053"
+  },
+  "id": "us9tMyToJS7IomI1",
+  "tags": []
+}
